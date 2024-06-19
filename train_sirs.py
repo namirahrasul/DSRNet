@@ -1,7 +1,7 @@
 import os
 from os.path import join
 
-import data.sirs_dataset as datasets
+import data.sirs_dataset as datasets # Custom dataset module for SIRS dataset
 import util.util as util
 from data.image_folder import read_fns
 from engine import Engine

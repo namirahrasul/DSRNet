@@ -1,17 +1,21 @@
-import argparse
-import models
+#Contains a base class that defines common options used by both training and testing. 
 
+import argparse #standard library for parsing command-line arguments.
+import models #creates a module object.
+#models.__dict__ is a dictionary that holds the namespace of the models module. This dictionary contains mappings of all names defined within the module e.g. all the symbols (functions, classes, variables, etc.) defined in that module. Stores key and value
 model_names = sorted(name for name in models.__dict__
                      if name.islower() and not name.startswith("__")
                      and callable(models.__dict__[name]))
-
+#convention is camelcase for Classes or Exceptions
+#__starting names are magic/dunder methods:the methods starting and ending with double underscores ‘__’. They are defined by built-in classes in Python and commonly used for operator overloading
+#callalble() means it can be called like a function.
+# so left with functioons and callable classes
 
 class BaseOptions():
     def __init__(self):
-        self.parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-        self.initialized = False
-
-    def initialize(self):
+        self.parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter) #formatter_class=how help messages should be formatted  # argparse.ArgumentDefaultsHelpFormatter: help output should include default values for arguments.
+        self.initialized = False #flag for tracking  whether the initialize() method has been called to prevent reinitialization
+    def initialize(self): # all the arguments added to parser
         # experiment specifics
         self.parser.add_argument('--name', type=str, default=None,
                                  help='name of the experiment. It decides where to store samples and models')

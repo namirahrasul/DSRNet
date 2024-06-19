@@ -1,3 +1,4 @@
+#configuration based on neural network
 import sys
 
 from options.base_option import BaseOptions as Base

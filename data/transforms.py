@@ -1,46 +1,53 @@
-from __future__ import division
+from __future__ import division #This ensures true division (i.e., division results in floating-point numbers) in Python 2 otherwise we get //
 
 import math
 import random
 
-import kornia
+import kornia #for computer vision operations in PyTorch.
 import torch
 from PIL import Image
 
 try:
-    import accimage
+    import accimage #third-party Python library designed to provide accelerated image loading and processing capabilities, primarily intended for use with the PyTorch deep learning framework.Alternative of PIL/pillow
 except ImportError:
     accimage = None
 import numpy as np
 import scipy.stats as st
 import cv2
 import collections
-import torchvision.transforms as transforms
+import torchvision.transforms as transforms # for common image transformations.
 import util.util as util
 from scipy.signal import convolve2d
 
 
-# utility
-def _is_pil_image(img):
+# utility     
+# 
+#  PIL and accimage for loading     
+def _is_pil_image(img): #if accimage is not supported in environment
     if accimage is not None:
         return isinstance(img, (Image.Image, accimage.Image))
     else:
         return isinstance(img, Image.Image)
 
+#in transformation step for augmentation and feeding into a model.
+def _is_tensor_image(img):  #to handle different types of image representations that might be encountered in various stages of image processing
+    return torch.is_tensor(img) and img.ndimension() == 3 # is 3D tensor
 
-def _is_tensor_image(img):
-    return torch.is_tensor(img) and img.ndimension() == 3
-
-
-def _is_numpy_image(img):
-    return isinstance(img, np.ndarray) and (img.ndim in {2, 3})
+# for certain preprocessing steps.
+def _is_numpy_image(img): #to handle different types of image representations that might be encountered in various stages of image processing
+    return isinstance(img, np.ndarray) and (img.ndim in {2, 3}) #is numpy array of 2 or 3 dimension
 
 
 def arrshow(arr):
-    Image.fromarray(arr.astype(np.uint8)).show()
+    Image.fromarray(arr.astype(np.uint8)).show()#converts a NumPy array to a PIL image and then displays it.
+    #arr.astype(np.uint8) converts the NumPy array arr to have a data type of np.uint8
+    # PIL images expect pixel values to be in the range [0, 255], 
+    #Image.fromarray() function is a method provided by the PIL (Pillow) library to convert a pixel values to a PIL image.
+    #.show() is a method of the PIL Image class to open image in image viewer of system
 
+'''"transformations" refer to a series of operations applied to the images to preprocess or augment them. These transformations can include resizing, cropping, flipping, rotating, and many others. They help in normalizing the data, enhancing certain features, or augmenting the dataset to improve the robustness and performance of the model.'''
 
-def get_transform(opt):
+def get_transform(opt): #based on option given, a list of transformations  are generated
     transform_list = []
     osizes = util.parse_args(opt.loadSize)
     fineSize = util.parse_args(opt.fineSize)
