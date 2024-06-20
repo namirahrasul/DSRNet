@@ -18,7 +18,7 @@ if opt.debug:
     opt.display_freq = 1
     opt.print_freq = 20
     opt.nEpochs = 40
-    opt.max_dataset_size = 9999
+    opt.max_dataset_size = 100 #9999
     opt.no_log = False
     opt.nThreads = 0
     opt.decay_iter = 0
