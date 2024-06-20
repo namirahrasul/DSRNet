@@ -42,13 +42,14 @@ class BaseOptions():
         self.parser.add_argument('--max_dataset_size', type=int, default=None,
                                  help='Maximum number of samples allowed per dataset. If the dataset directory contains more than max_dataset_size, only a subset is loaded.')
 
-        # for display
+        #(mingcv) for display
         self.parser.add_argument('--no-log', action='store_true', help='disable tf logger?')
         self.parser.add_argument('--no-verbose', action='store_true', help='disable verbose info?')
         self.parser.add_argument('--display_winsize', type=int, default=256, help='display window size')
         self.parser.add_argument('--display_port', type=int, default=8097, help='visdom port of the web display')
         self.parser.add_argument('--display_id', type=int, default=0,
                                  help='window id of the web display (use 0 to disable visdom)')
+        #In Visdom, you can create multiple windows to display various types of information, such as images, graphs, or tables, during the training and testing of machine learning models. The display_id specifies which window (by ID) the visualizations should be displayed in.
         self.parser.add_argument('--display_single_pane_ncols', type=int, default=0,
                                  help='if positive, display all images in a single visdom web panel with certain number of images per row.')
 

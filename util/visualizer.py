@@ -1,25 +1,26 @@
 import numpy as np
 import os
-import ntpath
+import ntpath #for handling Windows paths.
 import time
-from . import util
+from . import util # . = same package
 from . import html
-import visdom
+import visdom # for visualizing data.
 
 
 class Visualizer():
     def __init__(self, opt):
-        self.display_id = opt.display_id
+        self.display_id = opt.display_id #In Visdom, you can create multiple windows to display various types of information, such as images, graphs, or tables, during the training and testing of machine learning models. The display_id specifies which window (by ID) the visualizations should be displayed in.
         self.use_html = opt.isTrain and not opt.no_html
         #opt.isTrain==True means using train_options.py subclass
+        #HTML visualization in the context of deep learning involves generating web-based visual representations of the training process, model performance, and data. This can be particularly useful for monitoring, debugging, and sharing results. 
         self.win_size = opt.display_winsize
         self.name = opt.name
         self.opt = opt
         self.saved = False
-        if self.display_id > 0:
+        if self.display_id > 0: #if diplay_id==0, disable Visdom
             self.vis = visdom.Visdom(port=opt.display_port, ipv6=False)
 
-        if self.use_html:
+        if self.use_html: #logging training loss
             self.web_dir = os.path.join(opt.checkpoints_dir, opt.name, 'web')
             self.img_dir = os.path.join(self.web_dir, 'images')
             print('create web directory %s...' % self.web_dir)
@@ -32,9 +33,9 @@ class Visualizer():
     def reset(self):
         self.saved = False
 
-    # |visuals|: dictionary of images to display or save
+    # (mingcv)|visuals|: dictionary of images to display or save
     def display_current_results(self, visuals, epoch, save_result):
-        if self.display_id > 0:  # show images in the browser
+        if self.display_id > 0:  #(mingcv)show images in the browser
             ncols = self.opt.display_single_pane_ncols
             if ncols > 0:
                 h, w = next(iter(visuals.values())).shape[:2]
@@ -97,7 +98,7 @@ class Visualizer():
                 webpage.add_images(ims, txts, links, height=self.win_size)
             webpage.save()
 
-    # errors: dictionary of error labels and values
+    #(mingcv) errors: dictionary of error labels and values
     def plot_current_errors(self, epoch, counter_ratio, opt, errors):
         if not hasattr(self, 'plot_data'):
             self.plot_data = {'X': [], 'Y': [], 'legend': list(errors.keys())}
@@ -124,7 +125,7 @@ class Visualizer():
         with open(self.log_name, "a") as log_file:
             log_file.write('%s\n' % message)
 
-    # save image to the disk
+    # (mingcv) save image to the disk
     def save_images(self, webpage, visuals, image_path, aspect_ratio=1.0):
         image_dir = webpage.get_image_dir()
         short_path = ntpath.basename(image_path[0])
