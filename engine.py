@@ -18,22 +18,22 @@ class Engine(object):
 
         self.__setup()
 
-    def __setup(self):
-        self.basedir = join('checkpoints', self.opt.name)
+    def __setup(self):#private methods prefixed with __
+        self.basedir = join('checkpoints', self.opt.name) #creating directory path for checkpoint files
         os.makedirs(self.basedir, exist_ok=True)
 
         opt = self.opt
 
-        """Model"""
-        self.model = make_model(self.opt.model)()  # models.__dict__[self.opt.model]()
+        """(mingcv)Model"""
+        self.model = make_model(self.opt.model)()  #(mingcv)models.__dict__[self.opt.model]()
         self.model.initialize(opt)
-        if not opt.no_log:
+        if not opt.no_log: # setting up logging and visualisation
             self.writer = util.get_summary_writer(os.path.join(self.basedir, 'logs'))
             self.visualizer = Visualizer(opt)
 
     def train(self, train_loader, **kwargs):
         print('\nEpoch: %d' % self.epoch)
-        avg_meters = util.AverageMeters()
+        avg_meters = util.AverageMeters()#generating running averga eof metrics
         opt = self.opt
         model = self.model
         epoch = self.epoch
@@ -50,7 +50,7 @@ class Engine(object):
             avg_meters.update(errors)
             util.progress_bar(i, len(train_loader), str(avg_meters))
 
-            if not opt.no_log:
+            if not opt.no_log:#update logging and visualisation every iteration of training
                 util.write_loss(self.writer, 'train', avg_meters, iterations)
 
                 if iterations % opt.display_freq == 0 and opt.display_id != 0:
@@ -64,7 +64,7 @@ class Engine(object):
 
         self.epoch += 1
 
-        if not self.opt.no_log:
+        if not self.opt.no_log:#
             if self.epoch % opt.save_epoch_freq == 0:
                 print('saving the model at epoch %d, iters %d' %
                       (self.epoch, self.iterations))
@@ -84,15 +84,15 @@ class Engine(object):
             pass
 
     def eval(self, val_loader, dataset_name, savedir='./tmp', loss_key=None, max_save_size=None, **kwargs):
-        # print(dataset_name)
-        if savedir is not None:
+        #(mingcv)print(dataset_name)
+        if savedir is not None:# create a directory for saving if not exist
             os.makedirs(savedir, exist_ok=True)
             self.f = open(os.path.join(savedir, 'metrics.txt'), 'w+')
             self.f.write(dataset_name + '\n')
-        avg_meters = util.AverageMeters()
+        avg_meters = util.AverageMeters()#get running average metrics
         model = self.model
         opt = self.opt
-        with torch.no_grad():
+        with torch.no_grad():#disable gradient calculation to save memory
             for i, data in enumerate(val_loader):
                 if opt.selected and data['fn'][0].split('.')[0] not in opt.selected:
                     continue
@@ -101,7 +101,7 @@ class Engine(object):
                 else:
                     index = model.eval(data, savedir=savedir, **kwargs)
 
-                # print(data['fn'][0], index)
+                #(mingcv) print(data['fn'][0], index)
                 if savedir is not None:
                     self.f.write(f"{data['fn'][0]} {index['PSNR']} {index['SSIM']}\n")
                 avg_meters.update(index)

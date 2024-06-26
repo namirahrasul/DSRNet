@@ -14,4 +14,4 @@ def load_checkpoint(model, ckpt_path):
             ckpt[k[7:]] = v
         else:
             ckpt[k] = v
-    model.load_state_dict(ckpt)
+    model.load_state_dict(ckpt,strict=False) #strict=False by nami

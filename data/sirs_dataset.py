@@ -7,23 +7,24 @@ from os.path import join
 import cv2
 import numpy as np
 import torch.utils.data
-import torchvision.transforms.functional as TF
+import torchvision.transforms.functional as TF #more flexible and fine-grained transformations compared to the standard transforms API.
 from PIL import Image
 from scipy.signal import convolve2d
 
 from data.image_folder import make_dataset
-from data.torchdata import Dataset as BaseDataset
+from data.torchdata import Dataset as BaseDataset #overrides len(), + and []
 from data.transforms import to_tensor
 
 
 def __scale_width(img, target_width):
-    ow, oh = img.size
+    ow, oh = img.size #img.size method from (PIL) /Pillow, returns a tuple (width,height) in px
+    #original width and original height
     if (ow == target_width):
         return img
     w = target_width
-    h = int(target_width * oh / ow)
-    h = math.ceil(h / 2.) * 2  # round up to even
-    return img.resize((w, h), Image.BICUBIC)
+    h = int(target_width * oh / ow) #maintain aspect ratio by changing height
+    h = math.ceil(h / 2.) * 2  #(mingcv) round up to even
+    return img.resize((w, h), Image.BICUBIC) #resizes the image to the new dimensions (w, h) using bicubic interpolation. Bicubic interpolation is a method of resizing images that results in smoother and more visually appealing images compared to simpler methods like nearest neighbor or bilinear interpolation. From PIL/pillow
 
 
 def __scale_height(img, target_height):
@@ -36,40 +37,43 @@ def __scale_height(img, target_height):
     return img.resize((w, h), Image.BICUBIC)
 
 
-def paired_data_transforms(img_1, img_2, unaligned_transforms=False):
-    def get_params(img, output_size):
+def paired_data_transforms(img_1, img_2, unaligned_transforms=False):#img1, img2:PIL Image objects 
+#Unaligned transformations refer to transformations applied to paired images where the transformations are intentionally not synchronized between the two images. This approach introduces a controlled misalignment, adding variability to the data and potentially increasing the robustness of a model trained on such data.
+    def get_params(img, output_size):#inner nested function for scope & encapsulation
+        #getting dimensions for cropping
         w, h = img.size
         th, tw = output_size
         if w == tw and h == th:
-            return 0, 0, h, w
+            return 0, 0, h, w# no cropping as u crop form top left to bottom right
 
         i = random.randint(0, h - th)
         j = random.randint(0, w - tw)
-        return i, j, th, tw
+        return i, j, th, tw #i,j = starting position of cropped region
 
-    target_size = int(random.randint(224, 448) / 2.) * 2
+    target_size = int(random.randint(224, 448) / 2.) * 2 
+    '''??? why 224-448'''
     ow, oh = img_1.size
-    if ow >= oh:
+    if ow >= oh:#scale the smaller dimension
         img_1 = __scale_height(img_1, target_size)
         img_2 = __scale_height(img_2, target_size)
     else:
         img_1 = __scale_width(img_1, target_size)
         img_2 = __scale_width(img_2, target_size)
 
-    if random.random() < 0.5:
+    if random.random() < 0.5: #flip randomly pairs
         img_1 = TF.hflip(img_1)
         img_2 = TF.hflip(img_2)
 
-    if random.random() < 0.5:
+    if random.random() < 0.5: #rotate randomly pairs
         angle = random.choice([90, 180, 270])
         img_1 = TF.rotate(img_1, angle)
         img_2 = TF.rotate(img_2, angle)
-
+    #unalined transoformation by cropping 2 images differently
     i, j, h, w = get_params(img_1, (224, 224))
-    img_1 = TF.crop(img_1, i, j, h, w)
+    img_1 = TF.crop(img_1, i, j, h, w) 
 
     if unaligned_transforms:
-        # print('random shift')
+        #(mingcv) print('random shift')
         i_shift = random.randint(-10, 10)
         j_shift = random.randint(-10, 10)
         i += i_shift
@@ -82,11 +86,11 @@ def paired_data_transforms(img_1, img_2, unaligned_transforms=False):
 
 class ReflectionSynthesis(object):
     def __init__(self):
-        # Kernel Size of the Gaussian Blurry
+        #(mingcv) Kernel Size of the Gaussian Blurry
         self.kernel_sizes = [5, 7, 9, 11]
         self.kernel_probs = [0.1, 0.2, 0.3, 0.4]
 
-        # Sigma of the Gaussian Blurry
+        #(mingcv) Sigma of the Gaussian Blurry
         self.sigma_range = [2, 5]
         self.alpha_range = [0.8, 1.0]
         self.beta_range = [0.4, 1.0]

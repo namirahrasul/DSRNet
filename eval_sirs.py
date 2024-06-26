@@ -9,17 +9,17 @@ from engine import Engine
 from options.net_options.train_options import TrainOptions
 from tools import mutils
 
-opt = TrainOptions().parse()
-
-opt.isTrain = False
+opt = TrainOptions().parse() #parses training options from command-line arguments using the TrainOptions class and stores them in opt
+#evaluation settings:
+opt.isTrain = False 
 cudnn.benchmark = True
 opt.no_log = True
 opt.display_id = 0
 opt.verbose = False
 
-datadir = os.path.join(opt.base_dir, 'test')
+datadir = os.path.join(opt.base_dir, 'test')# test data directory
 
-# Define evaluation/test dataset
+#(mingcv) Define evaluation/test dataset
 eval_dataset_real = datasets.DSRTestDataset(join(datadir, f'real20_420'),
                                              fns=read_fns('data/real_test.txt'),
                                              if_align=opt.if_align)
