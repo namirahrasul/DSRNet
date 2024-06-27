@@ -17,7 +17,7 @@ opt.no_log = True
 opt.display_id = 0
 opt.verbose = False
 
-test_dataset_real = datasets.RealDataset('./data',
+test_dataset_real = datasets.DSRTestDataset(join(datadir, f'real20_420'),
                                              fns=read_fns('data/real_test.txt'),
                                              if_align=opt.if_align)
 #test_dataset_real = datasets.RealDataset('./data')
