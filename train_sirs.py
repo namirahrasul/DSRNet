@@ -47,7 +47,7 @@ train_dataloader_VOC = datasets.DataLoader(
     train_dataset, batch_size=opt.batchSize, shuffle=not opt.serial_batches,
     num_workers=opt.nThreads, pin_memory=True)
 train_dataloader_real = datasets.DataLoader(
-    train_dataset_real, batch_size=20, shuffle=False,
+    train_dataset_real,  batch_size=opt.batchSize, shuffle=False,
     num_workers=opt.nThreads, pin_memory=True)
 #train_dataloader_nature = datasets.DataLoader(train_dataset_nature, batch_size=opt.batchSize, shuffle=not opt.serial_batches,num_workers=opt.nThreads, pin_memory=True)
 ################################################
