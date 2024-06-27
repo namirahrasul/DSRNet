@@ -115,14 +115,14 @@ set_learning_rate(opt.lr)
 
 while engine.epoch < 120:
     print('random_seed: ', opt.seed)
-    engine.train(train_dataloader_real)#was train_dataloader_fusion
+    engine.train(train_dataloader_fusion)
 
     if engine.epoch % 1 == 0:
         save_dir = os.path.join(result_dir, '%03d' % engine.epoch)
         os.makedirs(save_dir, exist_ok=True)
 
-        #namirah commented this outttt
-        #engine.eval(eval_dataloader_real, dataset_name='testdata_real20', savedir=save_dir, suffix='real20')
-        #engine.eval(eval_dataloader_solidobject, dataset_name='testdata_solidobject', savedir=save_dir, suffix='solidobject')
-        #engine.eval(eval_dataloader_postcard, dataset_name='testdata_postcard', savedir=save_dir, suffix='postcard')
-        #engine.eval(eval_dataloader_wild, dataset_name='testdata_wild', savedir=save_dir, suffix='wild')
+        
+        engine.eval(eval_dataloader_real, dataset_name='testdata_real20', savedir=save_dir, suffix='real20')
+        engine.eval(eval_dataloader_solidobject, dataset_name='testdata_solidobject', savedir=save_dir, suffix='solidobject')
+        engine.eval(eval_dataloader_postcard, dataset_name='testdata_postcard', savedir=save_dir, suffix='postcard')
+        engine.eval(eval_dataloader_wild, dataset_name='testdata_wild', savedir=save_dir, suffix='wild')
