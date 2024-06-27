@@ -41,14 +41,24 @@ datadir_nature = join(datadir, 'train/nature')
 train_dataset = datasets.DSRDataset(
     datadir_syn, read_fns('data/VOC2012_224_train_png.txt'), size=opt.max_dataset_size, enable_transforms=True)
 
-train_dataset_real = datasets.DSRTestDataset(datadir_real, enable_transforms=True, if_align=opt.if_align)
+train_dataset_real = datasets.DSRTestDataset(datadir_real, enable_transforms=False, if_align=opt.if_align) #was true
 train_dataset_nature = datasets.DSRTestDataset(datadir_nature, enable_transforms=True, if_align=opt.if_align)
 
 train_dataset_fusion = datasets.FusionDataset([train_dataset,
                                                train_dataset_real,
                                                train_dataset_nature], [0.6, 0.2, 0.2],
                                                size=opt.num_train if opt.num_train > 0 else 4000)
-
+#namirah######################################
+train_dataloader_VOC = datasets.DataLoader(
+    train_dataset, batch_size=opt.batchSize, shuffle=not opt.serial_batches,
+    num_workers=opt.nThreads, pin_memory=True)
+train_dataloader_real = datasets.DataLoader(
+    train_dataset_real, batch_size=20, shuffle=False,
+    num_workers=16, pin_memory=True)
+train_dataloader_nature = datasets.DataLoader(
+    train_dataset_nature, batch_size=opt.batchSize, shuffle=not opt.serial_batches,
+    num_workers=opt.nThreads, pin_memory=True)
+################################################
 train_dataloader_fusion = datasets.DataLoader(
     train_dataset_fusion, batch_size=opt.batchSize, shuffle=not opt.serial_batches,
     num_workers=opt.nThreads, pin_memory=True)
