@@ -42,6 +42,17 @@ train_dataloader_fusion = datasets.DataLoader(
     train_dataset_fusion, batch_size=opt.batchSize, shuffle=not opt.serial_batches,
     pin_memory=True, prefetch_factor=32, num_workers=32)
 
+#namirah######################################
+train_dataloader_VOC = datasets.DataLoader(
+    train_dataset, batch_size=opt.batchSize, shuffle=not opt.serial_batches,
+    num_workers=opt.nThreads, pin_memory=True)
+train_dataloader_real = datasets.DataLoader(
+    train_dataset_real, batch_size=20, shuffle=False,
+    num_workers=16, pin_memory=True)
+train_dataloader_nature = datasets.DataLoader(
+    train_dataset_nature, batch_size=opt.batchSize, shuffle=not opt.serial_batches,
+    num_workers=opt.nThreads, pin_memory=True)
+################################################
 eval_dataset_real = datasets.DSRTestDataset(join(datadir, f'test/real20_{opt.real20_size}'),
                                             fns=read_fns('data/real_test.txt'), if_align=opt.if_align)
 eval_dataset_solidobject = datasets.DSRTestDataset(join(datadir, 'test/SIR2/SolidObjectDataset'),
@@ -94,16 +105,16 @@ if opt.resume or opt.debug_eval:
 set_learning_rate(opt.lr)
 while engine.epoch < 50:
     print('random_seed: ', opt.seed)
-    engine.train(train_dataloader_fusion)
+    engine.train(train_dataloader_real)
 
     if engine.epoch % 1 == 0:
         save_dir = os.path.join(result_dir, '%03d' % engine.epoch)
         os.makedirs(save_dir, exist_ok=True)
-        engine.eval(eval_dataloader_real, dataset_name='testdata_real20',
+        '''engine.eval(eval_dataloader_real, dataset_name='testdata_real20',
                     savedir=save_dir, suffix='real20', max_save_size=10)
         engine.eval(eval_dataloader_solidobject, dataset_name='testdata_solidobject',
                     savedir=save_dir, suffix='solidobject', max_save_size=10)
         engine.eval(eval_dataloader_postcard, dataset_name='testdata_postcard',
                     savedir=save_dir, suffix='postcard', max_save_size=10)
         engine.eval(eval_dataloader_wild, dataset_name='testdata_wild',
-                    savedir=save_dir, suffix='wild', max_save_size=10)
+                    savedir=save_dir, suffix='wild', max_save_size=10)'''
