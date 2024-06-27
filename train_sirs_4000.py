@@ -48,17 +48,7 @@ train_dataset_fusion = datasets.FusionDataset([train_dataset,
                                                train_dataset_real,
                                                train_dataset_nature], [0.6, 0.2, 0.2],
                                                size=opt.num_train if opt.num_train > 0 else 4000)
-#namirah######################################
-train_dataloader_VOC = datasets.DataLoader(
-    train_dataset, batch_size=opt.batchSize, shuffle=not opt.serial_batches,
-    num_workers=opt.nThreads, pin_memory=True)
-train_dataloader_real = datasets.DataLoader(
-    train_dataset_real, batch_size=opt.batchSize, shuffle=not opt.serial_batches,
-    num_workers=opt.nThreads, pin_memory=True)
-train_dataloader_nature = datasets.DataLoader(
-    train_dataset_nature, batch_size=opt.batchSize, shuffle=not opt.serial_batches,
-    num_workers=opt.nThreads, pin_memory=True)
-################################################
+
 train_dataloader_fusion = datasets.DataLoader(
     train_dataset_fusion, batch_size=opt.batchSize, shuffle=not opt.serial_batches,
     num_workers=opt.nThreads, pin_memory=True)
@@ -115,14 +105,14 @@ set_learning_rate(opt.lr)
 
 while engine.epoch < 120:
     print('random_seed: ', opt.seed)
-    engine.train(train_dataloader_real)#was train_dataloader_fusion
+    engine.train(train_dataloader_fusion)
 
     if engine.epoch % 1 == 0:
         save_dir = os.path.join(result_dir, '%03d' % engine.epoch)
         os.makedirs(save_dir, exist_ok=True)
 
-        #namirah commented this outttt
-        #engine.eval(eval_dataloader_real, dataset_name='testdata_real20', savedir=save_dir, suffix='real20')
-        #engine.eval(eval_dataloader_solidobject, dataset_name='testdata_solidobject', savedir=save_dir, suffix='solidobject')
-        #engine.eval(eval_dataloader_postcard, dataset_name='testdata_postcard', savedir=save_dir, suffix='postcard')
-        #engine.eval(eval_dataloader_wild, dataset_name='testdata_wild', savedir=save_dir, suffix='wild')
+        
+        engine.eval(eval_dataloader_real, dataset_name='testdata_real20', savedir=save_dir, suffix='real20')
+        engine.eval(eval_dataloader_solidobject, dataset_name='testdata_solidobject', savedir=save_dir, suffix='solidobject')
+        engine.eval(eval_dataloader_postcard, dataset_name='testdata_postcard', savedir=save_dir, suffix='postcard')
+        engine.eval(eval_dataloader_wild, dataset_name='testdata_wild', savedir=save_dir, suffix='wild')
